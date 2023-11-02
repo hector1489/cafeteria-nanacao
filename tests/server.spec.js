@@ -1,39 +1,39 @@
 const request = require("supertest")
 const server = require("../index")
 
-describe("Operaciones CRUD de cafes", () => {
-
-    it("Retorna un status code 200 con el  array", async () => {
-        const { statusCode: status, body: cafes } = await request(server).get("/cafes").send()
-        expect(status).toBe(200)
-        expect(cafes).toBeInstanceOf(Array)
+describe("Operaciones CRUD de cafés", () => {
+    it("Debería retornar un código de estado 200 y un arreglo", async () => {
+        const { statusCode, body } = await request(server).get("/cafes").send()
+        expect(statusCode).toBe(200)
+        expect(body).toBeInstanceOf(Array)
     })
 
-    it("codigo 404 si elimina cafe sin id", async () => {
-        const jwt = "token"
-        const coffeid = 123456789
-        const { statusCode: status } = await request(server)
-            .delete(`/cafes/${coffeid}`)
+    it("Debería devolver un código 404 al eliminar un café sin un ID válido", async () => {
+        const jwt = "token";
+        const idCafe = 123456789
+        const { statusCode } = await request(server)
+            .delete(`/cafes/${idCafe}`)
             .set("Authorization", jwt)
             .send();
-        expect(status).toBe(404)
+        expect(statusCode).toBe(404);
     })
 
-    it("Agregar Post / devuelve codigo 201", async () => {
-        const id = Math.floor(Math.random() * 999)
-        const coffe = { id, nombre: "New Coffe" }
-        const { statusCode: status } = await request(server)
+    it("La ruta POST /cafes debería devolver un código 201 y agregar un café", async () => {
+        const id = Math.floor(Math.random() * 999);
+        const cafe = { id, nombre: "Nuevo Café" };
+        const { statusCode, body } = await request(server)
             .post("/cafes")
-            .send(coffe)
-        expect(status).toBe(201)
-    });
+            .send(cafe);
+        expect(statusCode).toBe(201);
+        expect(body).toEqual(expect.arrayContaining([cafe]))
+    })
 
-    it("Ruta Put /cafes devuelve 400", async () => {
-        const notId = 1313
-        const coffe = { id: 1212, nombre: "frapuccino" }
-        const { statusCode: status } = await request(server)
-            .put(`/cafes/${notId}`)
-            .send(coffe)
-        expect(status).toBe(400)
+    it("La ruta PUT /cafes debería devolver un código 400", async () => {
+        const idNoValido = 1313
+        const cafe = { id: 1212, nombre: "frappuccino" }
+        const { statusCode } = await request(server)
+            .put(`/cafes/${idNoValido}`)
+            .send(cafe);
+        expect(statusCode).toBe(400)
     })
 })
